@@ -5,7 +5,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import PlantPanel from "@/components/plant-panel";
 import ThemeToggle from "@/components/theme-toggle";
-import type { Plant, Reading } from "@/lib/types";
+import FarmGeoMap from "@/components/farm-geo-map";
+import { statusFor, type Status } from "@/lib/status";
+import type { Plant, Reading, PlantIngestStatus } from "@/lib/types";
 
 export default function DemoView({
   orgName,
@@ -22,6 +24,22 @@ export default function DemoView({
   const [selectedPlant, setSelectedPlant] = useState(initialPlant);
   const [readings, setReadings] = useState<Reading[]>(initialReadings);
   const [loading, setLoading] = useState(false);
+  const [ingestStatus, setIngestStatus] = useState<Record<string, PlantIngestStatus>>({});
+
+  useEffect(() => {
+    if (!initialPlant) return;
+    supabase
+      .from("plant_ingest_status")
+      .select("*")
+      .eq("org_id", initialPlant.org_id)
+      .then(({ data }) => {
+        const map: Record<string, PlantIngestStatus> = {};
+        for (const row of (data ?? []) as PlantIngestStatus[]) map[row.plant_id] = row;
+        setIngestStatus(map);
+      });
+    // Only needs to run once - this page has a single fixed org.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadReadings = useCallback(
     async (plant: Plant) => {
@@ -45,6 +63,11 @@ export default function DemoView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPlant]);
 
+  const statusByPlant: Record<string, Status> = {};
+  for (const p of plants) {
+    statusByPlant[p.id] = statusFor(ingestStatus[p.id]?.latest_soil_pct);
+  }
+
   return (
     <main className="min-h-screen bg-bg px-6 py-6 text-ink">
       <div className="mx-auto max-w-5xl">
@@ -65,20 +88,13 @@ export default function DemoView({
         </div>
 
         {plants.length > 1 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {plants.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPlant(p)}
-                className={`rounded-full border px-3 py-1 text-xs font-mono ${
-                  selectedPlant?.id === p.id
-                    ? "border-accent bg-accent text-accent-ink"
-                    : "border-border text-ink2"
-                }`}
-              >
-                {p.name}
-              </button>
-            ))}
+          <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
+            <FarmGeoMap
+              plants={plants}
+              statusByPlant={statusByPlant}
+              selectedPlantId={selectedPlant?.id}
+              onSelect={setSelectedPlant}
+            />
           </div>
         )}
 

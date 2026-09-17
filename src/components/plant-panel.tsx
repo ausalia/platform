@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -10,32 +11,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { Reading } from "@/lib/types";
-
-type Status = "good" | "warning" | "critical" | "idle";
-
-function statusFor(soilPct: number | null | undefined): Status {
-  if (soilPct === null || soilPct === undefined) return "idle";
-  if (soilPct < 20) return "critical";
-  if (soilPct < 40) return "warning";
-  return "good";
-}
-
-const STATUS_COLOR: Record<Status, string> = {
-  good: "var(--status-ok)",
-  warning: "var(--status-stress)",
-  critical: "var(--status-critical)",
-  idle: "var(--status-idle)",
-};
-
-const STATUS_LABEL: Record<Status, string> = {
-  good: "Nominal",
-  warning: "Elevated",
-  critical: "Critical",
-  idle: "No data",
-};
+import { statusFor, STATUS_COLOR, STATUS_LABEL, type Status } from "@/lib/status";
+import StatusIcon from "@/components/status-icon";
 
 function fmt(v: number | null | undefined, digits: number, unit: string) {
-  if (v === null || v === undefined) return "—";
+  if (v === null || v === undefined) return "-";
   return `${v.toFixed(digits)}${unit}`;
 }
 
@@ -49,6 +29,17 @@ export function timeAgo(ts: string | null | undefined) {
   if (hours < 24) return `${hours}h ago`;
   return `${Math.round(hours / 24)}d ago`;
 }
+
+const METRICS = [
+  { key: "soil_pct", label: "Soil", unit: "%", digits: 0 },
+  { key: "root_temp_c", label: "Root", unit: "°C", digits: 1 },
+  { key: "air_temp_c", label: "Air", unit: "°C", digits: 1 },
+  { key: "humidity_pct", label: "Humidity", unit: "%", digits: 0 },
+  { key: "pressure_hpa", label: "Pressure", unit: " hPa", digits: 0 },
+  { key: "weight_g", label: "Weight", unit: "kg", digits: 2, scale: 1 / 1000 },
+] as const;
+
+type MetricKey = (typeof METRICS)[number]["key"];
 
 export default function PlantPanel({
   name,
@@ -65,13 +56,17 @@ export default function PlantPanel({
   lastReadingLabel?: string | null;
   stale?: boolean;
 }) {
+  const [metric, setMetric] = useState<MetricKey>("soil_pct");
+  const metricDef = METRICS.find((m) => m.key === metric)!;
+
   const latest = readings[readings.length - 1];
   const status: Status = stale ? "idle" : statusFor(latest?.soil_pct);
+
   const chartData = readings
-    .filter((r) => r.soil_pct !== null)
+    .filter((r) => r[metric] !== null)
     .map((r) => ({
       time: new Date(r.ts).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
-      soil_pct: r.soil_pct,
+      value: "scale" in metricDef ? r[metric]! * metricDef.scale : r[metric],
     }));
 
   return (
@@ -87,7 +82,9 @@ export default function PlantPanel({
             background: `color-mix(in srgb, ${STATUS_COLOR[status]} 16%, var(--surface))`,
           }}
         >
-          <span className="h-2 w-2 rounded-full" style={{ background: STATUS_COLOR[status] }} />
+          <span style={{ color: STATUS_COLOR[status] }}>
+            <StatusIcon status={status} size={10} />
+          </span>
           {STATUS_LABEL[status]}
         </span>
       </div>
@@ -107,9 +104,25 @@ export default function PlantPanel({
         />
       </div>
 
-      <div className="mt-6 h-56">
+      <div className="mt-6 flex flex-wrap gap-1.5">
+        {METRICS.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setMetric(m.key)}
+            className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide ${
+              metric === m.key
+                ? "border-accent bg-accent text-accent-ink"
+                : "border-border text-ink2"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 h-56">
         {loading ? (
-          <p className="text-sm text-ink2">Loading…</p>
+          <p className="text-sm text-ink2">Loading.</p>
         ) : chartData.length < 2 ? (
           <p className="text-sm text-ink2">Not enough data yet for a trend.</p>
         ) : (
@@ -125,10 +138,11 @@ export default function PlantPanel({
                   borderRadius: 8,
                   fontSize: 12,
                 }}
+                formatter={(value) => [`${Number(value).toFixed(metricDef.digits)}${metricDef.unit}`, metricDef.label]}
               />
               <Line
                 type="monotone"
-                dataKey="soil_pct"
+                dataKey="value"
                 stroke="var(--canopy)"
                 strokeWidth={2}
                 dot={{ r: 3, fill: "var(--canopy)" }}

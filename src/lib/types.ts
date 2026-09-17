@@ -25,6 +25,7 @@ export type PlantIngestStatus = {
   name: string;
   last_reading_at: string | null;
   is_stale: boolean;
+  latest_soil_pct: number | null;
 };
 
 export type IrrigationConfig = {

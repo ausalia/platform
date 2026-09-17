@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import type { Org, Plant, Reading, IrrigationConfig, PlantIngestStatus } from "@/lib/types";
 import PlantPanel, { timeAgo } from "@/components/plant-panel";
 import ThemeToggle from "@/components/theme-toggle";
+import FarmMap from "@/components/farm-map";
+import FarmGeoMap from "@/components/farm-geo-map";
+import { statusFor, type Status } from "@/lib/status";
 
 function pad2(n: number) {
   return n < 10 ? `0${n}` : `${n}`;
@@ -44,10 +47,6 @@ export default function DashboardView({
   const isDemo = selectedOrg.is_demo;
 
   useEffect(() => {
-    if (isDemo) {
-      setIngestStatus({});
-      return;
-    }
     supabase
       .from("plant_ingest_status")
       .select("*")
@@ -57,7 +56,7 @@ export default function DashboardView({
         for (const row of (data ?? []) as PlantIngestStatus[]) map[row.plant_id] = row;
         setIngestStatus(map);
       });
-  }, [selectedOrg.id, isDemo, supabase]);
+  }, [selectedOrg.id, supabase]);
 
   const loadPlantData = useCallback(
     async (plant: Plant) => {
@@ -125,7 +124,7 @@ export default function DashboardView({
       .single();
 
     if (error) {
-      setIrrStatus("Save failed — try again");
+      setIrrStatus("Save failed, try again");
       return;
     }
     setIrrigation(data as IrrigationConfig);
@@ -133,6 +132,13 @@ export default function DashboardView({
   }
 
   const plantIngest = selectedPlant ? ingestStatus[selectedPlant.id] : undefined;
+
+  const statusByPlant: Record<string, Status> = {};
+  for (const p of plants) {
+    const ingest = ingestStatus[p.id];
+    statusByPlant[p.id] =
+      !isDemo && ingest?.is_stale ? "idle" : statusFor(ingest?.latest_soil_pct);
+  }
 
   return (
     <main className="min-h-screen bg-bg px-6 py-6 text-ink">
@@ -165,25 +171,22 @@ export default function DashboardView({
         </div>
 
         {plants.length > 1 && (
-          <div className="mt-4 flex gap-2">
-            {plants.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPlant(p)}
-                className={`rounded-full border px-3 py-1 text-xs font-mono ${
-                  selectedPlant?.id === p.id
-                    ? "border-accent bg-accent text-accent-ink"
-                    : "border-border text-ink2"
-                }`}
-              >
-                {p.name}
-                {ingestStatus[p.id]?.is_stale && (
-                  <span className="ml-1" style={{ color: "var(--status-stress)" }}>
-                    · stale
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
+            {isDemo ? (
+              <FarmGeoMap
+                plants={plants}
+                statusByPlant={statusByPlant}
+                selectedPlantId={selectedPlant?.id}
+                onSelect={setSelectedPlant}
+              />
+            ) : (
+              <FarmMap
+                plants={plants}
+                statusByPlant={statusByPlant}
+                selectedPlantId={selectedPlant?.id}
+                onSelect={setSelectedPlant}
+              />
+            )}
           </div>
         )}
 

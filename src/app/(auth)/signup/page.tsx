@@ -27,7 +27,7 @@ export default async function SignupPage({
             id="orgName"
             name="orgName"
             type="text"
-            placeholder="Agrícola Punto Azul"
+            placeholder="Your organization name"
             className="rounded-lg border border-bone/15 bg-forest px-3 py-2 text-sm text-bone outline-none focus:border-amber"
           />
         </div>

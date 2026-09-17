@@ -28,7 +28,7 @@ export default function Home() {
         </h1>
         <p className="mt-5 max-w-xl text-base text-ink2 sm:text-lg">
           A field node that hears the quiet acoustic signs of drought stress in a plant&apos;s
-          xylem, long before it shows by looking. We&apos;re still early — right now it&apos;s
+          xylem, long before it shows by looking. We&apos;re still early. Right now it&apos;s
           listening to one plant, named Hope.
         </p>
 
