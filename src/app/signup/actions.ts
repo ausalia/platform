@@ -23,21 +23,28 @@ export async function signup(formData: FormData) {
     redirect("/signup/check-email");
   }
 
-  const { data: org, error: orgError } = await supabase
+  // See dashboard/actions.ts's createOrganization for why this skips
+  // .select() on the insert: no membership exists yet, so RLS would reject
+  // reading the row back and roll back the whole insert.
+  const orgId = crypto.randomUUID();
+
+  const { error: orgError } = await supabase
     .from("organizations")
-    .insert({ name: orgName || `${email}'s workspace` })
-    .select("id")
-    .single();
+    .insert({ id: orgId, name: orgName || `${email}'s workspace` });
 
   if (orgError) {
     redirect(`/signup?error=${encodeURIComponent(orgError.message)}`);
   }
 
-  await supabase.from("memberships").insert({
+  const { error: memberError } = await supabase.from("memberships").insert({
     user_id: data.session!.user.id,
-    org_id: org!.id,
+    org_id: orgId,
     role: "owner",
   });
+
+  if (memberError) {
+    redirect(`/signup?error=${encodeURIComponent(memberError.message)}`);
+  }
 
   redirect("/dashboard");
 }
