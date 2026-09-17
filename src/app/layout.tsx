@@ -32,6 +32,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          // Runs before paint so the manual theme toggle doesn't flash the
+          // wrong theme on load. Reads the same key theme-toggle.tsx writes.
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('ausalia-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
