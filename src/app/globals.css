@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+/* Ausalia brand tokens - see AUSALIA_BRAND.md in the design handoff.
+   Light theme is the bare :root default; dark follows prefers-color-scheme,
+   with a [data-theme] override reserved for a future manual toggle. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --forest: #14261c;
+  --canopy: #1b3a2b;
+  --amber: #e8a13a;
+  --amber-deep: #c77f1e;
+  --sage: #5c7a63;
+  --sap: #a9c7a0;
+  --bone: #f4f1ea;
+  --bone-2: #ede8dc;
+  --ink: #1a1a1a;
+  --grey: #6a7a6f;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --status-ok: #5c7a63;
+  --status-stress: #e8a13a;
+  --status-critical: #c0491f;
+  --status-idle: #7a8a80;
+
+  /* structural tokens the app actually consumes */
+  --bg: #f4f1ea;
+  --surface: #ede8dc;
+  --ink2: #5c7a63;
+  --accent: #1b3a2b;
+  --accent-ink: #f4f1ea;
+  --border: rgba(20, 38, 28, 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #14261c;
+    --surface: #1b3a2b;
+    --ink: #f4f1ea;
+    --ink2: #a9c7a0;
+    --accent: #a9c7a0;
+    --accent-ink: #14261c;
+    --border: rgba(244, 241, 234, 0.14);
   }
 }
 
+:root[data-theme="dark"] {
+  --bg: #14261c;
+  --surface: #1b3a2b;
+  --ink: #f4f1ea;
+  --ink2: #a9c7a0;
+  --accent: #a9c7a0;
+  --accent-ink: #14261c;
+  --border: rgba(244, 241, 234, 0.14);
+}
+
+@theme inline {
+  --color-forest: var(--forest);
+  --color-canopy: var(--canopy);
+  --color-amber: var(--amber);
+  --color-amber-deep: var(--amber-deep);
+  --color-sage: var(--sage);
+  --color-sap: var(--sap);
+  --color-bone: var(--bone);
+  --color-bone-2: var(--bone-2);
+
+  --color-status-ok: var(--status-ok);
+  --color-status-stress: var(--status-stress);
+  --color-status-critical: var(--status-critical);
+  --color-status-idle: var(--status-idle);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-border: var(--border);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
 }
