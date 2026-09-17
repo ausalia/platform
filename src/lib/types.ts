@@ -19,6 +19,14 @@ export type Reading = {
   weight_g: number | null;
 };
 
+export type PlantIngestStatus = {
+  plant_id: string;
+  org_id: string;
+  name: string;
+  last_reading_at: string | null;
+  is_stale: boolean;
+};
+
 export type IrrigationConfig = {
   plant_id: string;
   hour1: number;

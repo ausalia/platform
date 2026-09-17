@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Org, Plant, Reading, IrrigationConfig } from "@/lib/types";
+import type { Org, Plant, Reading, IrrigationConfig, PlantIngestStatus } from "@/lib/types";
 import {
   LineChart,
   Line,
@@ -45,6 +45,17 @@ function fmt(v: number | null | undefined, digits: number, unit: string) {
   return `${v.toFixed(digits)}${unit}`;
 }
 
+function timeAgo(ts: string | null | undefined) {
+  if (!ts) return "never";
+  const ms = Date.now() - new Date(ts).getTime();
+  const mins = Math.round(ms / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
 export default function DashboardView({
   orgs,
   demoOrg,
@@ -74,8 +85,25 @@ export default function DashboardView({
   const [irrigation, setIrrigation] = useState(initialIrrigationConfig);
   const [irrStatus, setIrrStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [ingestStatus, setIngestStatus] = useState<Record<string, PlantIngestStatus>>({});
 
   const isDemo = selectedOrg.is_demo;
+
+  useEffect(() => {
+    if (isDemo) {
+      setIngestStatus({});
+      return;
+    }
+    supabase
+      .from("plant_ingest_status")
+      .select("*")
+      .eq("org_id", selectedOrg.id)
+      .then(({ data }) => {
+        const map: Record<string, PlantIngestStatus> = {};
+        for (const row of (data ?? []) as PlantIngestStatus[]) map[row.plant_id] = row;
+        setIngestStatus(map);
+      });
+  }, [selectedOrg.id, isDemo, supabase]);
 
   const loadPlantData = useCallback(
     async (plant: Plant) => {
@@ -151,7 +179,8 @@ export default function DashboardView({
   }
 
   const latest = readings[readings.length - 1];
-  const status = statusFor(latest?.soil_pct);
+  const plantIngest = selectedPlant ? ingestStatus[selectedPlant.id] : undefined;
+  const status: Status = plantIngest?.is_stale ? "idle" : statusFor(latest?.soil_pct);
   const chartData = readings
     .filter((r) => r.soil_pct !== null)
     .map((r) => ({
@@ -201,6 +230,11 @@ export default function DashboardView({
                 }`}
               >
                 {p.name}
+                {ingestStatus[p.id]?.is_stale && (
+                  <span className="ml-1" style={{ color: "var(--status-stress)" }}>
+                    · stale
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -231,6 +265,11 @@ export default function DashboardView({
                   {STATUS_LABEL[status]}
                 </span>
               </div>
+              {!isDemo && (
+                <p className="mt-1 text-xs text-ink2">
+                  Last reading {timeAgo(plantIngest?.last_reading_at ?? latest?.ts)}
+                </p>
+              )}
 
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Tile label="Soil moisture" value={fmt(latest?.soil_pct, 0, "%")} />
