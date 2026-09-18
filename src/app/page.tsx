@@ -29,7 +29,8 @@ export default function Home() {
         <p className="mt-5 max-w-xl text-base text-ink2 sm:text-lg">
           A field node that hears the quiet acoustic signs of drought stress in a plant&apos;s
           xylem, long before it shows by looking. We&apos;re still early. Right now it&apos;s
-          listening to one plant, named Hope.
+          listening to one plant, named{" "}
+          <span className="font-semibold text-accent">Hope</span>.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
