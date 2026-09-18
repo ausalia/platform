@@ -26,6 +26,11 @@
   --ink2: #5c7a63;
   --accent: #1b3a2b;
   --accent-ink: #f4f1ea;
+  --surface-2: color-mix(in srgb, #ede8dc 88%, #1b3a2b 6%);
+  --accent-soft: color-mix(in srgb, #1b3a2b 12%, transparent);
+  --river: #4f8fd1;
+  --wm-aus: #1b3a2b;
+  --wm-alia: #1b3a2b;
   --border: rgba(20, 38, 28, 0.14);
 }
 
@@ -37,6 +42,11 @@
     --ink2: #a9c7a0;
     --accent: #a9c7a0;
     --accent-ink: #14261c;
+    --surface-2: color-mix(in srgb, #1b3a2b 72%, #14261c 28%);
+    --accent-soft: color-mix(in srgb, #a9c7a0 18%, transparent);
+    --river: #5aa3e8;
+    --wm-aus: #f4f1ea;
+    --wm-alia: #e8a13a;
     --border: rgba(244, 241, 234, 0.14);
   }
 }
@@ -48,6 +58,11 @@
   --ink2: #a9c7a0;
   --accent: #a9c7a0;
   --accent-ink: #14261c;
+  --surface-2: color-mix(in srgb, #1b3a2b 72%, #14261c 28%);
+  --accent-soft: color-mix(in srgb, #a9c7a0 18%, transparent);
+  --river: #5aa3e8;
+  --wm-aus: #f4f1ea;
+  --wm-alia: #e8a13a;
   --border: rgba(244, 241, 234, 0.14);
 }
 
@@ -68,6 +83,9 @@
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-river: var(--river);
   --color-ink: var(--ink);
   --color-ink2: var(--ink2);
   --color-accent: var(--accent);
