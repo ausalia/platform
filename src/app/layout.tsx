@@ -21,7 +21,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ausalia",
+  title: "Auselia",
   description: "Edge-AI silicon that listens to plants.",
 };
 

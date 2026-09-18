@@ -73,7 +73,7 @@ export default function DemoView({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/" className="font-[family-name:var(--font-display)] text-lg font-semibold">
-            AUSALIA
+            AUSELIA
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-xs text-ink2">{orgName} · demo</span>

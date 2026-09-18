@@ -145,7 +145,7 @@ export default function DashboardView({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-            AUSALIA
+            AUSELIA
           </h1>
           <div className="flex items-center gap-3">
             <select

@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           href="/"
           className="mb-8 block text-center font-[family-name:var(--font-display)] text-2xl font-semibold text-bone"
         >
-          AUSALIA
+          AUSELIA
         </Link>
         <div className="rounded-2xl border border-bone/10 bg-canopy p-8">{children}</div>
       </div>
