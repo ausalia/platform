@@ -23,9 +23,9 @@ brew install librsvg        # provides rsvg-convert
 ```
 
 Output lands in `brand/build/`:
-`Auselia-Brand-Guidelines-v0.3.pdf` and `Auselia-Logo-Analysis-Report.pdf`.
+`Auselia-Brand-Guidelines-v0.4.pdf` and `Auselia-Logo-Analysis-Report.pdf`.
 
-Optional, for previewing pages as images: `pdftoppm -r 70 -png brand/build/Auselia-Brand-Guidelines-v0.3.pdf /tmp/page`
+Optional, for previewing pages as images: `pdftoppm -r 70 -png brand/build/Auselia-Brand-Guidelines-v0.4.pdf /tmp/page`
 (part of poppler, `brew install poppler`).
 
 ## Editing
@@ -41,5 +41,5 @@ The guidelines script reads two files from the app so the map and illustration s
 
 ## Rules the documents follow
 
-No em dashes. Amber is never text on a light background. Status is never color alone.
-See the guidelines PDF, pages 10 to 12 and 23.
+No em dashes and no semicolons. Amber is never text on a light background. Status is never color alone.
+See the guidelines PDF, pages 10 to 12 and 25.

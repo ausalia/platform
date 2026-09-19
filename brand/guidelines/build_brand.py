@@ -7,9 +7,15 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-VERSION = "0.3"
+VERSION = "0.4"
 # Newest first. Add an entry (and bump VERSION) every time the guide changes.
 CHANGELOG = [
+    ("0.4", "September 18, 2026", [
+        "Punctuation rule tightened: no em dashes and no semicolons. Write two sentences.",
+        "New page: Writing rules. Two registers (brand voice and technical writing) and eleven habits, adapted from ASD-STE100.",
+        "New page: One name for one thing. A short word list, before and after examples, and what we chose not to take from STE.",
+        "Contents page numbers now checked against the real pages when the guide builds.",
+    ]),
     ("0.3", "September 18, 2026", [
         "Contents page redesigned as an evenly spaced grid.",
         "Added this change log as the last page.",
@@ -82,7 +88,11 @@ def wrap(x, top, s, w, font="Inter", size=10.5, color=INK, lead=None, alpha=1.0)
     return top
 def wrap_h(s, w, font="Inter", size=10.5, lead=None):
     return len(simpleSplit(s, font, size, w)) * (lead or size * 1.5)
+SECTION_START = {}
 def kicker(x, top, s, color=SAGE):
+    m = re.match(r"(\d\d)  ", s)
+    if m and m.group(1) not in SECTION_START:
+        SECTION_START[m.group(1)] = page_no[0]
     text(x, top, s.upper(), "Mono-Med", 7.6, color, cs=1.6)
 def rect(x, top, w, h, color, r=0, a=1.0):
     fill(color, a)
@@ -194,21 +204,23 @@ text(M, 470, f"Version {VERSION}  /  {CHANGELOG[0][1]}", "Mono", 8, SAP, cs=0.8)
 # ============================ 2. CONTENTS ============================
 new()
 title("What is in this guide")
+CONTENTS_PAGES = {}
 sections = [
     ("01", "The idea", "What Auselia is, the name, and the one tension behind every choice", "03"),
     ("02", "The mark", "Logo, variants, lockups, clear space, sizes, and what to avoid", "05"),
     ("03", "Color", "Palette, ratios, tested contrast pairs, and status colors", "10"),
-    ("04", "Type and voice", "Three typefaces, how we write, taglines, and copy examples", "13"),
-    ("05", "Imagery, motion, data", "The plant, the signal rings, charts, the map, and the interface", "17"),
-    ("06", "In use", "Website, app icon, field signage, chip silkscreen, ship checklist", "21"),
-    ("07", "Reference", "Palette, type, mark, status, voice and motion on one page", "24"),
-    ("08", "Change log", "What changed in each version of this guide", "25"),
+    ("04", "Type and voice", "Three typefaces, how we write, writing rules, taglines, and examples", "13"),
+    ("05", "Imagery, motion, data", "The plant, the signal rings, charts, the map, and the interface", "19"),
+    ("06", "In use", "Website, app icon, field signage, chip silkscreen, ship checklist", "23"),
+    ("07", "Reference", "Palette, type, mark, status, voice and motion on one page", "26"),
+    ("08", "Change log", "What changed in each version of this guide", "27"),
 ]
 GX, GY = 24, 14
 cw_ = (W - 2 * M - GX) / 2
 ch_ = 74
 top0 = 140
 for i, (n, name, desc, pg) in enumerate(sections):
+    CONTENTS_PAGES[n] = int(pg)
     x = M + (i % 2) * (cw_ + GX)
     t = top0 + (i // 2) * (ch_ + GY)
     rect(x, t, cw_, ch_, BONE2, 12)
@@ -557,7 +569,7 @@ wrap(x, 318, "listen, detect, hear, sense, read, flag, catch", 380, "Inter-Med",
 text(x, 360, "NEVER", "Mono-Semi", 8, "#E86A6A", cs=1.6)
 wrap(x, 382, "revolutionary, seamless, cutting-edge, disrupt, world-class, next-generation, effortless, robust, powerful", 400, "Inter", 11, BONE, lead=17, alpha=0.85)
 frame(M, 400, 400, 70, SAP, 10, 0.7, 0.5)
-centered_lines(M, 400, 400, 70, ["Punctuation rule: no em dashes. Use a period or a comma.", "Sentence case. Numbers with units in mono."], "Inter", 10.5, BONE, lead=17, align="center")
+centered_lines(M, 400, 400, 70, ["Punctuation: no em dashes and no semicolons.", "Write two sentences. Sentence case. Numbers with units in mono."], "Inter", 10.5, BONE, lead=17, align="center")
 
 # ============================ 15. TAGLINES ============================
 new()
@@ -597,6 +609,84 @@ for bad, good, why in ex:
     text(M + 450, t + 58, why, "Inter", 8, SAP, alpha=0.9)
     t += 76
 text(M, 456, "Spanish status words: Normal, Elevado, Crítico, Sin datos. Same tone in both languages, not a literal translation.", "Inter", 9.4, GREY)
+
+# ============================ 17. WRITING RULES ============================
+new()
+kicker(M, 56, "04  Type and voice")
+title("Writing rules", top=100)
+lede_one("Two registers, one set of habits: precise always, warm where it fits.", top=128)
+# registers
+rect(M, 152, 384, 150, CANOPY, 14)
+text(M + 22, 178, "BRAND VOICE", "Mono-Semi", 7.6, AMBER, cs=1.6)
+text(M + 22, 200, "Taglines, hero copy, decks, social", "SG-Bold", 13.5, BONE)
+wrap(M + 22, 222, "Warm and plain. Contractions are fine and so is a fragment. Quiet wonder, never hype.", 340, "Inter", 9.8, BONE, lead=14, alpha=0.9)
+text(M + 22, 282, "We listen to what plants can\u2019t say.", "SG-Med", 12, SAP)
+rect(M, 318, 384, 150, BONE2, 14)
+text(M + 22, 344, "TECHNICAL WRITING", "Mono-Semi", 7.6, AMBER_DEEP, cs=1.6)
+text(M + 22, 366, "Docs, README, UI text, errors, alerts, PRs", "SG-Bold", 13.5, CANOPY)
+wrap(M + 22, 388, "Plain and exact. Short sentences, active voice, no contractions, no voice tricks. The reader is busy and often not a native English speaker.", 340, "Inter", 9.8, INK, lead=14)
+text(M + 22, 448, "If the pump fails, turn off irrigation.", "SG-Med", 12, CANOPY)
+# rules
+rules_ = [("No em dashes, no semicolons", "Write two sentences instead."),
+          ("Keep sentences short", "20 words or fewer for an instruction, 25 for a description."),
+          ("One name for one thing", "Pick a word and keep it. See the next page."),
+          ("Use the short word", "Use, not utilize. Start, not commence."),
+          ("Active voice, simple tenses", "The node sends a reading. Not: a reading has been sent."),
+          ("Use a verb for an action", "Analyze the log, not perform an analysis of the log."),
+          ("Condition first, then a comma", "If soil moisture is below 20%, irrigate."),
+          ("Define an abbreviation once", "TinyML, RISC-V. Then use it."),
+          ("Labels stay labels", "Nominal, No data. Do not expand them into sentences."),
+          ("Three nouns in a row, at most", "Irrigation schedule editor is fine. Longer than that, split it."),
+          ("No phrasal verbs in technical text", "Not spin up, roll out or dive into.")]
+rx = M + 416
+yy = 160
+for i_, (a_, b_) in enumerate(rules_):
+    text(rx, yy, f"{i_ + 1:02d}", "Mono-Med", 8, AMBER_DEEP, cs=0.8)
+    text(rx + 26, yy, a_, "SG-Bold", 10.6, CANOPY)
+    text(rx + 26, yy + 13, b_, "Inter", 8.8, GREY)
+    yy += 29.5
+text(M, 490, "Adapted from ASD-STE100 Simplified Technical English. Unofficial, and not affiliated with ASD.", "Inter", 7.8, SAGE)
+
+# ============================ 18. ONE NAME ============================
+new()
+kicker(M, 56, "04  Type and voice")
+title("One name for one thing", top=100)
+lede_one("A reader should never wonder whether two words mean two things. Pick one and keep it.", top=128)
+# word table
+tx0, tw0 = M, 500
+hdr = [("USE", 0, 96), ("NOT", 104, 150), ("MEANS", 268, 232)]
+for h_, off, _ in hdr:
+    text(tx0 + off + 14, 160, h_, "Mono-Semi", 7.4, SAGE, cs=1.4)
+rows_ = [("node", "device, unit, gadget", "The Auselia field hardware."),
+         ("reading", "measurement, data point", "One set of values a node uploads at one time."),
+         ("cuartel", "block, plot", "A surveyed subdivision of a property."),
+         ("irrigation", "watering", "The pump schedule and the kill switch that turns it off."),
+         ("Nominal, Elevated, Critical, No data", "OK, healthy, warning, alert", "The four status words. Always with their shape.")]
+ry = 172
+for use, notw, means in rows_:
+    hh = 46
+    rect(tx0, ry, tw0, hh, BONE2, 10)
+    wrap(tx0 + 14, ry + 21, use, 88, "SG-Bold", 11 if len(use) < 14 else 8.6, CANOPY, lead=11)
+    text(tx0 + 118, ry + 21, notw, "Inter", 9, S_CRIT) if len(notw) < 26 else wrap(tx0 + 118, ry + 19, notw, 140, "Inter", 9, S_CRIT, lead=12)
+    wrap(tx0 + 282, ry + 19, means, 208, "Inter", 9, INK, lead=12)
+    ry += 52
+# before and after
+bx = M + 530
+text(bx, 160, "BEFORE AND AFTER", "Mono-Semi", 7.4, SAGE, cs=1.4)
+pairs_ = [("The data is being collected by the node and will be sent.", "The node collects the data, then sends it."),
+          ("Utilize the schedule editor to facilitate irrigation changes.", "Use the schedule editor to change irrigation."),
+          ("It is recommended that irrigation is disabled in the event that the pump fails.", "If the pump fails, turn off irrigation.")]
+py_ = 172
+for bad, good in pairs_:
+    rect(bx, py_, 318, 84, BONE2, 10)
+    wrap(bx + 14, py_ + 20, bad, 262, "Inter", 8.8, GREY, lead=12)
+    stroke(S_CRIT, 1.4); c.line(bx + 296, Y(py_ + 10), bx + 306, Y(py_ + 20)); c.line(bx + 306, Y(py_ + 10), bx + 296, Y(py_ + 20))
+    rect(bx, py_ + 44, 318, 40, CANOPY, 10); rect(bx, py_ + 44, 318, 10, CANOPY)
+    wrap(bx + 14, py_ + 68, good, 296, "Inter-Med", 9.6, BONE, lead=12)
+    py_ += 92
+# not taken
+text(M, 456, "What we chose not to take from STE", "SG-Bold", 10.6, CANOPY)
+wrap(M, 471, "The 875-word dictionary, the must and should substitutions, and the ban on contractions in brand voice. They would remove the warmth. STE itself says it is not for marketing copy.", 500, "Inter", 8.8, GREY, lead=12)
 
 # ============================ 17. IMAGERY ============================
 new()
@@ -786,7 +876,7 @@ title("Before you ship anything", top=100)
 lede("Run this on every screen, slide, print or label. If one box is empty, fix it first.", top=128, w=520)
 checks = ["I can see the living thing AND the instrument in it.", "Amber is 10% or less and only on an action, one key datum, or a stress state.", "No amber text on any light background.",
           "Body text is Ink on Bone or Bone on Forest.", "Every status has a color, a shape and a word.", "Field or outdoor use: forest ground, bone text, amber accent.",
-          "Only Space Grotesk, Inter and IBM Plex Mono. No soft or script fonts.", "No banned words. No em dashes.", "The mark has its clear space and is not smaller than 24 px.", "Motion is small, occasional, and switches off for reduced-motion users."]
+          "Only Space Grotesk, Inter and IBM Plex Mono. No soft or script fonts.", "No banned words. No em dashes or semicolons.", "The mark has its clear space and is not smaller than 24 px.", "Motion is small, occasional, and switches off for reduced-motion users."]
 t = 164
 for i, ch in enumerate(checks):
     x = M + (i % 2) * 432; y_ = t + (i // 2) * 56
@@ -807,7 +897,7 @@ for col, nme in [(FOREST, "Forest"), (CANOPY, "Canopy"), (AMBER, "Amber"), (SAGE
 qc = [("Type", "Space Grotesk Bold for display. Inter for body. IBM Plex Mono for data and labels."),
       ("Mark", "Color on light, reversed on dark, tile below 24 px. Clear space is one node diameter."),
       ("Status", "Circle Nominal, triangle Elevated, diamond Critical, dash No data. Always with its word."),
-      ("Voice", "Listen, hear, signal, node, field. No hype. No em dashes."),
+      ("Voice", "Listen, hear, signal, node, field. No hype. Short sentences. No em dashes or semicolons."),
       ("Say", "Edge-AI silicon that listens to plants.  We listen to what plants can’t say."),
       ("Motion", "Three amber rings, then about 7 quiet seconds. Off for reduced motion.")]
 t = 236
@@ -821,7 +911,7 @@ new()
 kicker(M, 56, "08  Change log")
 title("Change log", top=100)
 text(M, 124, "Newest first. The version number is in the footer of every page.", "Inter", 11, GREY)
-ty = 156
+ty = 148
 colw = 330
 line_x = M + 6
 first_y = ty + 8
@@ -849,12 +939,15 @@ for vi, (ver, date, items) in enumerate(CHANGELOG):
         col_items(M + 150, items[:half]); col_items(M + 150 + colw + 24, items[half:])
     else:
         col_items(M + 150, items)
-    ty += block_h + 34
+    ty += block_h + 22
+assert ty <= 496, f"change log is too long for one page (ends at {ty:.0f}). Split it or shorten older entries."
 last_y = dots[-1][0]
 stroke(SAP, 1.2, 0.8); c.line(line_x, Y(dots[0][0]), line_x, Y(last_y))
 for y_, latest in dots:
     fill(AMBER if latest else SAGE); c.circle(line_x, Y(y_), 4.6 if latest else 3.6, stroke=0, fill=1)
     stroke(BONE, 2); c.circle(line_x, Y(y_), 4.6 if latest else 3.6, stroke=1, fill=0)
 
+for n_, actual in SECTION_START.items():
+    assert CONTENTS_PAGES.get(n_) == actual, f"contents says section {n_} starts on page {CONTENTS_PAGES.get(n_)}, but it starts on page {actual}"
 c.save()
 print("pages:", page_no[0], "->", OUT)
