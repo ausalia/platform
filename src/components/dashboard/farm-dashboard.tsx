@@ -12,6 +12,7 @@ import { buildEnv, type EnvKey, type Range } from "@/lib/dashboard/env";
 import { buildSensorLayout, liveSensor, simNode, type SensorDot } from "@/lib/dashboard/sim";
 import type { DNode, Severity } from "@/lib/dashboard/types";
 import ThemeToggle from "@/components/theme-toggle";
+import Wordmark from "@/components/wordmark";
 import MapView from "./map-view";
 import MetricsPanel, { type PanelTab } from "./metrics-panel";
 import type { IrrigationPayload } from "./irrigation-block";
@@ -222,8 +223,6 @@ export default function FarmDashboard({
     ].filter(Boolean).join(" · ");
   }
 
-  const wm = { color: "var(--wm-aus)" };
-
   return (
     <div
       className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col px-7 pb-[60px] min-[901px]:h-screen min-[901px]:overflow-hidden min-[901px]:pb-3.5"
@@ -231,14 +230,8 @@ export default function FarmDashboard({
     >
       <div className="flex flex-none flex-wrap items-center justify-between gap-2.5 pt-[22px]">
         <div className="flex items-center gap-[9px] font-[family-name:var(--font-display)] text-[15px] font-bold tracking-[0.01em]">
-          <Link href="/" className="flex items-center gap-[9px]">
-            <span className="flex flex-none" style={wm} aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M5,22 C5,17 9,15 10,11 C10.6,8.5 12,7.5 13,7 L15,2.5 L17,9 L18.5,5.5 L20,7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="13" cy="7" r="1.7" style={{ fill: "var(--amber)" }} />
-              </svg>
-            </span>
-            <span><span style={wm}>AUS</span><span style={{ color: "var(--wm-alia)" }}>ELIA</span></span>
+          <Link href="/" className="flex items-center">
+            <Wordmark size={26} />
           </Link>
           <span className="font-normal text-ink2">·</span>
           <span>{org.name}</span>

@@ -1,14 +1,13 @@
 import Link from "next/link";
 import ThemeToggle from "@/components/theme-toggle";
 import PlantMark from "@/components/plant-mark";
+import Wordmark from "@/components/wordmark";
 
 export default function Home() {
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-bg text-ink">
       <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
-        <span className="font-[family-name:var(--font-display)] text-lg font-semibold">
-          AUSELIA
-        </span>
+        <Wordmark size={28} />
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <Link
