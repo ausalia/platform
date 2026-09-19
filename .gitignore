@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# brand tooling (generated output and local venv)
+brand/build/
+brand/.venv/
+__pycache__/
