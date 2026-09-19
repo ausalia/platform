@@ -5,7 +5,7 @@ import PlantMark from "@/components/plant-mark";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-bg text-ink">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-[family-name:var(--font-display)] text-lg font-semibold">
           AUSELIA
         </span>
