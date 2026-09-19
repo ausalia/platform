@@ -4,8 +4,8 @@ import PlantMark from "@/components/plant-mark";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col bg-bg text-ink">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-bg text-ink">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-[family-name:var(--font-display)] text-lg font-semibold">
           AUSELIA
         </span>
@@ -20,7 +20,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-start px-6 pb-12 pt-16 sm:pt-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-start px-6 pb-12 pt-16 sm:pt-24">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-ink2">
           Edge-AI silicon that listens to plants
         </span>
@@ -54,7 +54,9 @@ export default function Home() {
         </p>
       </div>
 
-      <PlantMark className="mx-auto mt-auto block h-40 w-40 text-ink2 opacity-80 sm:h-56 sm:w-56" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 mx-auto flex max-w-5xl justify-end px-6">
+        <PlantMark className="block h-24 w-24 text-ink2 opacity-30 sm:h-56 sm:w-56 sm:opacity-80" />
+      </div>
     </main>
   );
 }
