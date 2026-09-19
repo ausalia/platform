@@ -24,7 +24,7 @@ export default function Home() {
           Edge-AI silicon that listens to plants
         </span>
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          Auselia is listening.
+          Auselia is listening...
         </h1>
         <p className="mt-5 max-w-xl text-base text-ink2 sm:text-lg">
           A field node that hears the quiet acoustic signs of drought stress in a plant&apos;s
