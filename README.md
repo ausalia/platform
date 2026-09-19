@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Checks
+
+| Command | What it does |
+| --- | --- |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript, no emit |
+| `npm test` | Vitest unit tests (status logic, env aggregation, geometry, simulation, copy rules) |
+| `npm run test:db` | Row-level-security tests against the dev database. Needs `SUPABASE_DB_URL`. Runs in a transaction that is always rolled back |
+
+GitHub Actions runs lint, types, tests and build on every PR and on `main`, and the database tests whenever a migration changes.

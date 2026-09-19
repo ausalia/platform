@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { IrrigationConfig, Org, Plant, PlantIngestStatus, Reading } from "@/lib/types";
@@ -28,6 +28,9 @@ const byNatural = (a: Plant, b: Plant) => {
 
 type Layout = { dots: SensorDot[]; circuits: import("@/lib/dashboard/geo").Circuit[] };
 
+// Pure memoization: layouts are deterministic from (plant, sensors, status).
+const layoutCache = new Map<string, Layout>();
+
 export default function FarmDashboard({
   orgs, initialOrgId, userEmail, logoutAction,
 }: {
@@ -51,6 +54,7 @@ export default function FarmDashboard({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [rows, setRows] = useState<Reading[]>([]);
   const [rowsLoaded, setRowsLoaded] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const [irrigation, setIrrigation] = useState<IrrigationConfig | null>(null);
 
   const [range, setRange] = useState<Range>("day");
@@ -110,6 +114,7 @@ export default function FarmDashboard({
       .from("readings").select("*").eq("plant_id", plantId)
       .order("ts", { ascending: false }).limit(3000);
     setRows(((data ?? []) as Reading[]).reverse());
+    setNow(Date.now());
     setRowsLoaded(true);
   }, [supabase]);
 
@@ -150,27 +155,24 @@ export default function FarmDashboard({
 
   const node = nodes.find((n) => n.id === selectedId) ?? null;
 
-  const layoutCache = useRef(new Map<string, Layout>());
-  useEffect(() => { layoutCache.current.clear(); }, [orgId]);
   const layoutFor = useCallback((n: DNode): Layout => {
     const key = `${n.id}:${n.sensorCount}:${n.status}`;
-    const hit = layoutCache.current.get(key);
+    const hit = layoutCache.get(key);
     if (hit) return hit;
     const l: Layout = n.isLive
       ? { dots: [liveSensor(n.label, n.path, n.status)], circuits: [] }
       : buildSensorLayout(n.id, n.path, n.status, n.sensorCount);
-    layoutCache.current.set(key, l);
+    layoutCache.set(key, l);
     return l;
   }, []);
 
   const sensors = node ? layoutFor(node).dots : [];
   const dot = panelSensor ? sensors.find((s) => s.id === panelSensor) : undefined;
 
-  const anchor = isDemo && rows.length ? new Date(rows[rows.length - 1].ts).getTime() : Date.now();
+  const anchor = isDemo && rows.length ? new Date(rows[rows.length - 1].ts).getTime() : now;
   const { dates, env } = useMemo(
     () => buildEnv(rows, range, anchor, dot?.jitter ?? 1),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows, range, dot?.jitter, isDemo],
+    [rows, range, anchor, dot?.jitter],
   );
 
   const readingsFor = useCallback((_n: DNode, d: SensorDot) => {

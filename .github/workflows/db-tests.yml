@@ -1,0 +1,43 @@
+name: Database tests
+
+# Row-level-security tests against the DEV Supabase project. Runs when
+# migrations or the tests themselves change. Needs the SUPABASE_DB_URL secret
+# (Settings > Environments > dev-db). Fork PRs never get secrets, so they skip.
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "scripts/db-tests.mjs"
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "scripts/db-tests.mjs"
+  workflow_dispatch:
+
+concurrency:
+  group: db-tests
+  cancel-in-progress: false
+
+jobs:
+  rls:
+    name: RLS isolation tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: dev-db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Run RLS tests
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "SUPABASE_DB_URL not available (fork PR or secret not set); skipping."
+            exit 0
+          fi
+          npm run test:db

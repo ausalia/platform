@@ -12,7 +12,15 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Deno edge functions, not part of the Next.js app
+    "supabase/functions/**",
   ]),
+  {
+    rules: {
+      // Reset-on-change and load-on-mount effects here are intentional.
+      "react-hooks/set-state-in-effect": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;
