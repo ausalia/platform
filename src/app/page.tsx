@@ -1,9 +1,10 @@
 import Link from "next/link";
 import ThemeToggle from "@/components/theme-toggle";
+import PlantMark from "@/components/plant-mark";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <main className="flex min-h-screen flex-col bg-bg text-ink">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-[family-name:var(--font-display)] text-lg font-semibold">
           AUSELIA
@@ -19,7 +20,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-3xl flex-col items-start px-6 pb-24 pt-16 sm:pt-24">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-start px-6 pb-12 pt-16 sm:pt-24">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-ink2">
           Edge-AI silicon that listens to plants
         </span>
@@ -52,6 +53,8 @@ export default function Home() {
           We listen to what plants can&apos;t say.
         </p>
       </div>
+
+      <PlantMark className="mx-auto mt-auto block h-40 w-40 text-ink2 opacity-80 sm:h-56 sm:w-56" />
     </main>
   );
 }
