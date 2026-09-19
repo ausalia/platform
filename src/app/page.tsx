@@ -5,7 +5,7 @@ import Wordmark from "@/components/wordmark";
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col overflow-hidden bg-bg text-ink">
+    <main className="relative flex min-h-dvh flex-col overflow-hidden bg-bg text-ink">
       <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <Wordmark size={28} />
         <div className="flex items-center gap-3">
@@ -19,7 +19,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-start px-6 pb-12 pt-16 sm:pt-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-start px-6 pb-12 pt-10 sm:pt-24">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-ink2">
           Edge-AI silicon that listens to plants
         </span>
@@ -48,7 +48,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="mt-16 font-mono text-xs uppercase tracking-[0.14em] text-ink2">
+        <p className="mt-10 font-mono sm:mt-16 text-xs uppercase tracking-[0.14em] text-ink2">
           We listen to what plants can&apos;t say.
         </p>
       </div>
