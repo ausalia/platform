@@ -7,12 +7,39 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
+VERSION = "0.3"
+# Newest first. Add an entry (and bump VERSION) every time the guide changes.
+CHANGELOG = [
+    ("0.3", "September 18, 2026", [
+        "Contents page redesigned as an evenly spaced grid.",
+        "Added this change log as the last page.",
+        "Version numbers realigned: the revision that applied the first round of comments is now v0.2.",
+    ]),
+    ("0.2", "September 18, 2026", [
+        "Cover: signal rings centered exactly on the amber node.",
+        "Contents: removed the feedback card. Wording throughout is now official, not draft.",
+        "The idea: pronunciation confirmed as au\u00b7SE\u00b7lia.",
+        "The mark: more margin between the intro text and the card.",
+        "Variants, contrast and status pages: introductions fit on one line.",
+        "Status page: wording now covers people generally, not only men.",
+        "Lockups: stacked and horizontal lockups centered on their cards.",
+        "Voice: quote re-broken into two lines, punctuation-rule box centered.",
+        "The plant: removed the illustration license note.",
+        "Chip silkscreen: text moved up inside the circle.",
+        "Removed the questions page and the open-items page.",
+    ]),
+    ("0.1", "September 18, 2026", [
+        "First complete guide: idea, mark, color, type and voice, imagery, motion, data, interface, applications.",
+        "Included a feedback questions page and an open-items page for team review.",
+    ]),
+]
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 BRAND = os.path.dirname(HERE)
 REPO = os.path.dirname(BRAND)
 BUILD = os.path.join(BRAND, "build")
 A = os.path.join(BUILD, "guidelines", "assets")
-OUT = os.path.join(BUILD, "Auselia-Brand-Guidelines-v0.1.pdf")
+OUT = os.path.join(BUILD, f"Auselia-Brand-Guidelines-v{VERSION}.pdf")
 METRICS = json.load(open(os.path.join(BUILD, "analysis", "metrics.json")))
 GEO_TS = open(os.path.join(REPO, "src", "lib", "dashboard", "demo-geo.ts")).read()
 GEO = json.loads(re.search(r"DEMO_GEO: Geo = (\{.*\});", GEO_TS, re.S).group(1))
@@ -31,7 +58,7 @@ BONE, BONE2, INK, GREY = "#F4F1EA", "#EDE8DC", "#1A1A1A", "#6A7A6F"
 S_OK, S_STRESS, S_CRIT, S_IDLE = "#5C7A63", "#E8A13A", "#C0491F", "#7A8A80"
 
 c = canvas.Canvas(OUT, pagesize=(W, H))
-c.setTitle("Auselia Brand Guidelines v0.1")
+c.setTitle(f"Auselia Brand Guidelines v{VERSION}")
 c.setAuthor("Auselia")
 page_no = [0]
 
@@ -69,7 +96,7 @@ def img(name, x, top, w, h, anchor="c"):
 def bg(color): rect(0, 0, W, H, color)
 def chrome(dark=False, num=True):
     col = SAP if dark else SAGE
-    text(M, H - 22 + 0, "AUSELIA  /  BRAND GUIDELINES  /  VERSION 0.1", "Mono", 6.4, col, cs=1.2)
+    text(M, H - 22 + 0, f"AUSELIA  /  BRAND GUIDELINES  /  VERSION {VERSION}", "Mono", 6.4, col, cs=1.2)
     if num:
         text(W - M, H - 22, f"{page_no[0]:02d}", "Mono-Med", 7.5, col, "right")
 def new(dark=False, bgc=None):
@@ -157,12 +184,12 @@ node_x = CX + (28 + 4.6) / 64 * CS_
 node_y = CTOP + (24 - 3) / 64 * CS_
 for r_, a_ in [(46, 0.5), (86, 0.28), (130, 0.14)]:   # faint rings centered exactly on the amber node
     stroke(AMBER, 1.4, a_); c.circle(node_x, Y(node_y), r_, stroke=1, fill=0)
-kicker(M, 118, "Brand guidelines  /  version 0.1", SAP)
+kicker(M, 118, f"Brand guidelines  /  version {VERSION}", SAP)
 text(M, 205, "AUS", "SG-Bold", 76, BONE, cs=-1.5)
 text(M + stringWidth("AUS", "SG-Bold", 76) - 3, 205, "ELIA", "SG-Bold", 76, AMBER, cs=-1.5)
 text(M, 248, "Edge-AI silicon that listens to plants.", "Inter", 17, BONE, alpha=0.92)
 wrap(M, 330, "How Auselia looks, sounds and behaves: the mark, color, type, voice, motion and the interface.", 340, "Inter", 10.5, SAP, lead=16)
-text(M, 470, f"Version 0.1  /  {TODAY}", "Mono", 8, SAP, cs=0.8)
+text(M, 470, f"Version {VERSION}  /  {CHANGELOG[0][1]}", "Mono", 8, SAP, cs=0.8)
 
 # ============================ 2. CONTENTS ============================
 new()
@@ -175,15 +202,20 @@ sections = [
     ("05", "Imagery, motion, data", "The plant, the signal rings, charts, the map, and the interface", "17"),
     ("06", "In use", "Website, app icon, field signage, chip silkscreen, ship checklist", "21"),
     ("07", "Reference", "Palette, type, mark, status, voice and motion on one page", "24"),
+    ("08", "Change log", "What changed in each version of this guide", "25"),
 ]
-t = 152
-for n, name, desc, pg in sections:
-    text(M, t, n, "Mono-Med", 9, AMBER_DEEP, cs=1)
-    text(M + 48, t, name, "SG-Bold", 19, CANOPY)
-    text(M + 48, t + 19, desc, "Inter", 10.5, GREY)
-    text(W - M, t, pg, "Mono-Med", 9.5, SAGE, "right")
-    stroke(CANOPY, 0.6, 0.15); c.line(M, Y(t + 32), W - M, Y(t + 32))
-    t += 49
+GX, GY = 24, 14
+cw_ = (W - 2 * M - GX) / 2
+ch_ = 74
+top0 = 140
+for i, (n, name, desc, pg) in enumerate(sections):
+    x = M + (i % 2) * (cw_ + GX)
+    t = top0 + (i // 2) * (ch_ + GY)
+    rect(x, t, cw_, ch_, BONE2, 12)
+    text(x + 20, t + 29, n, "Mono-Med", 9, AMBER_DEEP, cs=1)
+    text(x + 52, t + 30, name, "SG-Bold", 17, CANOPY)
+    text(x + cw_ - 20, t + 29, pg, "Mono-Med", 9.5, SAGE, "right")
+    wrap(x + 52, t + 48, desc, cw_ - 52 - 24, "Inter", 9.8, GREY, lead=13.5)
 
 # ============================ 3. WHAT AUSELIA IS ============================
 new()
@@ -783,6 +815,46 @@ for i, (k, v) in enumerate(qc):
     x = M + (i % 2) * 432; y_ = t + (i // 2) * 76
     text(x, y_, k.upper(), "Mono-Semi", 8, AMBER, cs=1.6)
     wrap(x, y_ + 20, v, 400, "Inter", 11, BONE, lead=16, alpha=0.92)
+
+# ============================ 25. CHANGE LOG ============================
+new()
+kicker(M, 56, "08  Change log")
+title("Change log", top=100)
+text(M, 124, "Newest first. The version number is in the footer of every page.", "Inter", 11, GREY)
+ty = 156
+colw = 330
+line_x = M + 6
+first_y = ty + 8
+dots = []
+for vi, (ver, date, items) in enumerate(CHANGELOG):
+    two = len(items) > 4
+    w_ = colw if two else 690
+    hts = [wrap_h(it, w_ - 12, "Inter", 9.2, 12.5) + 3 for it in items]
+    if two:
+        half = (len(items) + 1) // 2
+        left, right = hts[:half], hts[half:]
+        block_h = max(sum(left), sum(right))
+    else:
+        block_h = sum(hts)
+    block_h = max(block_h, 30)
+    dots.append((ty + 8, vi == 0))
+    text(M + 24, ty + 14, f"v{ver}", "SG-Bold", 17, CANOPY if vi == 0 else SAGE)
+    text(M + 24, ty + 29, date, "Mono", 7.6, GREY, cs=0.4)
+    def col_items(x0, its):
+        yy = ty + 12
+        for it in its:
+            fill(AMBER if vi == 0 else SAGE); c.circle(x0 + 3, Y(yy - 3), 1.9, stroke=0, fill=1)
+            yy = wrap(x0 + 12, yy, it, w_ - 12, "Inter", 9.2, INK, lead=12.5) + 3
+    if two:
+        col_items(M + 150, items[:half]); col_items(M + 150 + colw + 24, items[half:])
+    else:
+        col_items(M + 150, items)
+    ty += block_h + 34
+last_y = dots[-1][0]
+stroke(SAP, 1.2, 0.8); c.line(line_x, Y(dots[0][0]), line_x, Y(last_y))
+for y_, latest in dots:
+    fill(AMBER if latest else SAGE); c.circle(line_x, Y(y_), 4.6 if latest else 3.6, stroke=0, fill=1)
+    stroke(BONE, 2); c.circle(line_x, Y(y_), 4.6 if latest else 3.6, stroke=1, fill=0)
 
 c.save()
 print("pages:", page_no[0], "->", OUT)

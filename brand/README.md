@@ -23,9 +23,9 @@ brew install librsvg        # provides rsvg-convert
 ```
 
 Output lands in `brand/build/`:
-`Auselia-Brand-Guidelines-v0.1.pdf` and `Auselia-Logo-Analysis-Report.pdf`.
+`Auselia-Brand-Guidelines-v0.3.pdf` and `Auselia-Logo-Analysis-Report.pdf`.
 
-Optional, for previewing pages as images: `pdftoppm -r 70 -png brand/build/Auselia-Brand-Guidelines-v0.1.pdf /tmp/page`
+Optional, for previewing pages as images: `pdftoppm -r 70 -png brand/build/Auselia-Brand-Guidelines-v0.3.pdf /tmp/page`
 (part of poppler, `brew install poppler`).
 
 ## Editing
